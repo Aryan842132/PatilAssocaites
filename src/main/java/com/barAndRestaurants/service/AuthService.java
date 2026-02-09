@@ -34,8 +34,15 @@ public class AuthService {
     }
 
     public JwtResponse authenticateUser(LoginRequest loginRequest) {
+        String principal;
+        if (loginRequest.getEmail() != null && !loginRequest.getEmail().isBlank()) {
+            principal = loginRequest.getEmail();
+        } else {
+            principal = loginRequest.getUsername();
+        }
+
         Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
+                new UsernamePasswordAuthenticationToken(principal, loginRequest.getPassword()));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String jwt = jwtUtils.generateJwtToken(authentication);
@@ -52,14 +59,21 @@ public class AuthService {
     }
 
     public void registerUser(SignupRequest signUpRequest) {
-        if (userRepository.existsByEmail(signUpRequest.getEmail())) {
+        if (signUpRequest.getUsername() != null && !signUpRequest.getUsername().isBlank() && userRepository.existsByUsername(signUpRequest.getUsername())) {
+            throw new RuntimeException("Error: Username is already taken!");
+        }
+
+        if (signUpRequest.getEmail() != null && userRepository.existsByEmail(signUpRequest.getEmail())) {
             throw new RuntimeException("Error: Email is already taken!");
         }
 
         // Create new user's account
         AppUser user = new AppUser();
-        // keep username field in sync for backward compatibility
-        user.setUsername(signUpRequest.getEmail());
+        if (signUpRequest.getUsername() != null && !signUpRequest.getUsername().isBlank()) {
+            user.setUsername(signUpRequest.getUsername());
+        } else {
+            user.setUsername(signUpRequest.getEmail());
+        }
         user.setEmail(signUpRequest.getEmail());
         user.setPassword(passwordEncoder.encode(signUpRequest.getPassword()));
 

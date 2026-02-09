@@ -22,9 +22,10 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        // The application uses email as the principal; the "username" parameter is treated as email.
+        // Try to resolve the principal first as email, then as username
         AppUser user = userRepository.findByEmail(username)
-            .orElseThrow(() -> new UsernameNotFoundException("User Not Found with email: " + username));
+            .orElseGet(() -> userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User Not Found with email/username: " + username)));
 
         return new User(
             user.getEmail(),
