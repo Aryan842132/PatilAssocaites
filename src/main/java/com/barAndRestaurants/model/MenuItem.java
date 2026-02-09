@@ -11,6 +11,6 @@ public class MenuItem {
     private String id;
     private String name;
     private double price;
-    private String category; // e.g., "Food", "Drink"
+    private String category;
     private String description;
 }

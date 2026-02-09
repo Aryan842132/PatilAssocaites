@@ -15,7 +15,7 @@ public class Order {
     private String tableId;
     private List<OrderItem> items;
     private double totalAmount;
-    private String status; // PENDING, CONFIRMED, SERVED, COMPLETED
+    private String status;
     private LocalDateTime orderTime;
 
     @Data

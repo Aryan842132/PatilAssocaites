@@ -1,14 +1,15 @@
 package com.barAndRestaurants.service;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.barAndRestaurants.model.RestaurantTable;
 import com.barAndRestaurants.model.User;
 import com.barAndRestaurants.repository.RestaurantTableRepository;
 import com.barAndRestaurants.repository.UserRepository;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
 
 @Service
 public class RestaurantService {
@@ -26,21 +27,20 @@ public class RestaurantService {
 
     @Transactional
     public User bookTable(int requiredCapacity) {
-        // Simple logic: find first available table with enough capacity
         List<RestaurantTable> freeTables = tableRepository.findByIsOccupied(false);
         RestaurantTable table = freeTables.stream()
                 .filter(t -> t.getCapacity() >= requiredCapacity)
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("No available table found for capacity: " + requiredCapacity));
 
-        // Create User/Session
+        
         User user = new User();
         user.setTableId(table.getId());
         user.setActive(true);
         user.setConnectedAt(LocalDateTime.now());
         user = userRepository.save(user);
 
-        // Update Table
+       
         table.setOccupied(true);
         table.setCurrentUserId(user.getId());
         tableRepository.save(table);
