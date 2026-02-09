@@ -3,6 +3,7 @@ package com.barAndRestaurants.controller;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -30,9 +31,15 @@ public class RestaurantController {
     }
 
     @PostMapping("/book")
-    public User bookTable(@RequestBody Map<String, Integer> payload) {
+    public ResponseEntity<?> bookTable(@RequestBody Map<String, Integer> payload) {
         int capacity = payload.getOrDefault("capacity", 2);
-        return restaurantService.bookTable(capacity);
+        User user = restaurantService.bookTable(capacity);
+        return ResponseEntity.ok(Map.of(
+                "userId", user.getUserId(),
+                "tableId", user.getTableId(),
+                "active", user.isActive(),
+                "connectedAt", user.getConnectedAt()
+        ));
     }
 
     @PostMapping("/release")

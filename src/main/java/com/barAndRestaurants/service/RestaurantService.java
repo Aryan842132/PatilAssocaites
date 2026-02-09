@@ -42,7 +42,7 @@ public class RestaurantService {
 
        
         table.setOccupied(true);
-        table.setCurrentUserId(user.getId());
+        table.setCurrentUserId(user.getUserId());
         tableRepository.save(table);
 
         return user;
