@@ -1,31 +1,29 @@
-# Use OpenJDK 17 slim image as base
-FROM openjdk:17-jdk-slim
+# ---------- BUILD STAGE ----------
+FROM maven:3.9.6-eclipse-temurin-17 AS build
 
-# Set working directory
 WORKDIR /app
 
-# Copy Maven files
+# Copy pom.xml first for dependency caching
 COPY pom.xml .
-COPY .mvn .mvn
-COPY mvnw .
-
-# Make mvnw executable
-RUN chmod +x ./mvnw
-
-# Download dependencies (to cache them separately)
-RUN ./mvnw dependency:go-offline
+RUN mvn dependency:go-offline
 
 # Copy source code
-COPY src src
+COPY src ./src
 
 # Build the application
-RUN ./mvnw clean package -DskipTests
+RUN mvn clean package -DskipTests
 
-# Expose port (Railway will set PORT environment variable)
+
+# ---------- RUN STAGE ----------
+FROM eclipse-temurin:17-jre
+
+WORKDIR /app
+
+# Copy jar from build stage
+COPY --from=build /app/target/*.jar app.jar
+
+# Railway provides PORT automatically
 EXPOSE 8080
 
-# Set environment variable for production profile
-ENV SPRING_PROFILES_ACTIVE=prod
-
-# Run the application
-ENTRYPOINT ["java", "-jar", "target/barAndRestaurants-0.0.1-SNAPSHOT.jar"]
+# Run Spring Boot
+ENTRYPOINT ["java", "-jar", "app.jar"]
