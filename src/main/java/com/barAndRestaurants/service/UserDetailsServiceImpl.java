@@ -22,12 +22,13 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        AppUser user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User Not Found with username: " + username));
+        // The application uses email as the principal; the "username" parameter is treated as email.
+        AppUser user = userRepository.findByEmail(username)
+            .orElseThrow(() -> new UsernameNotFoundException("User Not Found with email: " + username));
 
         return new User(
-                user.getUsername(),
-                user.getPassword(),
-                Collections.singletonList(new SimpleGrantedAuthority(user.getRole().name())));
+            user.getEmail(),
+            user.getPassword(),
+            Collections.singletonList(new SimpleGrantedAuthority(user.getRole().name())));
     }
 }

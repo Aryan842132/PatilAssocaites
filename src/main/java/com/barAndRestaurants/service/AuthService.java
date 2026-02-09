@@ -35,7 +35,7 @@ public class AuthService {
 
     public JwtResponse authenticateUser(LoginRequest loginRequest) {
         Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
+                new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String jwt = jwtUtils.generateJwtToken(authentication);
@@ -46,19 +46,21 @@ public class AuthService {
                 .collect(Collectors.toList());
 
         return new JwtResponse(jwt,
-                userDetails.getId(),
-                userDetails.getUsername(),
-                roles);
+            userDetails.getId(),
+            userDetails.getUsername(),
+            roles);
     }
 
     public void registerUser(SignupRequest signUpRequest) {
-        if (userRepository.existsByUsername(signUpRequest.getUsername())) {
-            throw new RuntimeException("Error: Username is already taken!");
+        if (userRepository.existsByEmail(signUpRequest.getEmail())) {
+            throw new RuntimeException("Error: Email is already taken!");
         }
 
         // Create new user's account
         AppUser user = new AppUser();
-        user.setUsername(signUpRequest.getUsername());
+        // keep username field in sync for backward compatibility
+        user.setUsername(signUpRequest.getEmail());
+        user.setEmail(signUpRequest.getEmail());
         user.setPassword(passwordEncoder.encode(signUpRequest.getPassword()));
 
         Set<String> strRoles = signUpRequest.getRole();
