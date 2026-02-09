@@ -1,6 +1,6 @@
 package com.barAndRestaurants.security;
 
-import com.barAndRestaurants.service.UserDetailsImpl;
+import com.barAndRestaurants.service.UserDetailsServiceImpl.UserDetailsImpl;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import org.slf4j.Logger;
