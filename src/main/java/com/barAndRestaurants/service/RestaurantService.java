@@ -26,8 +26,16 @@ public class RestaurantService {
 
     @Transactional
     public AppUser bookTable(String appUserId, int requiredCapacity) {
-        AppUser appUser = appUserRepository.findById(appUserId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        AppUser appUser = null;
+        if (appUserId == null || appUserId.isBlank()) {
+            AppUser guest = new AppUser();
+            guest.setUsername("guest-" + System.currentTimeMillis());
+            appUser = appUserRepository.save(guest);
+            appUserId = appUser.getUsersId();
+        } else {
+            appUser = appUserRepository.findById(appUserId)
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+        }
 
         List<RestaurantTable> freeTables = tableRepository.findByIsOccupied(false);
         RestaurantTable table = freeTables.stream()
