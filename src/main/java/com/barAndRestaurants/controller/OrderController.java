@@ -1,9 +1,17 @@
 package com.barAndRestaurants.controller;
 
+import java.util.List;
+
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.barAndRestaurants.model.Order;
 import com.barAndRestaurants.service.OrderService;
-import org.springframework.web.bind.annotation.*;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/orders")
@@ -17,25 +25,25 @@ public class OrderController {
 
     @PostMapping
     public Order createOrder(@RequestBody OrderRequest request) {
-        return orderService.createOrder(request.getUserId(), request.getItems());
+        return orderService.createOrder(request.getAppUsersId(), request.getItems());
     }
 
-    @GetMapping("/{userId}")
-    public List<Order> getOrders(@PathVariable String userId) {
-        return orderService.getOrdersByAppUser(userId);
+    @GetMapping("/{appUsersId}")
+    public List<Order> getOrders(@PathVariable("appUsersId") String appUsersId) {
+        return orderService.getOrdersByAppUser(appUsersId);
     }
 
     // DTO for Order Request
     public static class OrderRequest {
-        private String userId;
+        private String appUsersId;
         private List<Order.OrderItem> items;
 
-        public String getUserId() {
-            return userId;
+        public String getAppUsersId() {
+            return appUsersId;
         }
 
-        public void setUserId(String userId) {
-            this.userId = userId;
+        public void setAppUsersId(String appUsersId) {
+            this.appUsersId = appUsersId;
         }
 
         public List<Order.OrderItem> getItems() {
