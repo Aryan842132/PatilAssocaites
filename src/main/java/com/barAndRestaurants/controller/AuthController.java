@@ -3,6 +3,7 @@ package com.barAndRestaurants.controller;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -16,9 +17,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.barAndRestaurants.model.AppUser;
 import com.barAndRestaurants.payload.LoginRequest;
 import com.barAndRestaurants.payload.SignupRequest;
-import com.barAndRestaurants.service.AuthService;
 import com.barAndRestaurants.repository.AppUserRepository;
-import org.springframework.http.HttpStatus;
+import com.barAndRestaurants.service.AuthService;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -37,7 +37,7 @@ public class AuthController {
         return ResponseEntity.ok(userRepository.findAll());
     }
 
-    @DeleteMapping("/users/{usersId}")
+    @DeleteMapping("/{usersId}")
     public ResponseEntity<?> deleteUser(@PathVariable String usersId) {
         try {
             if (!userRepository.existsById(usersId)) {
