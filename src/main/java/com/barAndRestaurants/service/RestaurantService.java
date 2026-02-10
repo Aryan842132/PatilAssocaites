@@ -60,9 +60,13 @@ public class RestaurantService {
 
     @Transactional
     public void releaseTable(String appUserId) {
+        if (appUserId == null || appUserId.isBlank()) {
+            throw new IllegalArgumentException("appUserId must not be null or empty");
+        }
+
         appUserRepository.findById(appUserId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
-        
+
         List<RestaurantTable> occupiedTables = tableRepository.findByCurrentUserIdAndIsOccupied(appUserId, true);
         for (RestaurantTable table : occupiedTables) {
             table.setOccupied(false);

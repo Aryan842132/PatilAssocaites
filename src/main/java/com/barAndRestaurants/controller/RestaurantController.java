@@ -54,8 +54,17 @@ public class RestaurantController {
     }
 
     @PostMapping("/release")
-    public void releaseTable(@RequestBody Map<String, String> payload) {
+    public ResponseEntity<?> releaseTable(@RequestBody Map<String, String> payload) {
         String appUserId = payload.get("appUserId");
-        restaurantService.releaseTable(appUserId);
+        if (appUserId == null || appUserId.isBlank()) {
+            return ResponseEntity.badRequest().body(Map.of("message", "appUserId is required"));
+        }
+
+        try {
+            restaurantService.releaseTable(appUserId);
+            return ResponseEntity.ok(Map.of("message", "Table(s) released", "appUserId", appUserId));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
+        }
     }
 }
