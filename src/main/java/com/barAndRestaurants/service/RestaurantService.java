@@ -41,7 +41,15 @@ public class RestaurantService {
         RestaurantTable table = freeTables.stream()
                 .filter(t -> t.getCapacity() >= requiredCapacity)
                 .findFirst()
-                .orElseThrow(() -> new RuntimeException("No available table found for capacity: " + requiredCapacity));
+                .orElseThrow(() -> {
+                    int tableCount = (int) tableRepository.count();
+                    long occupied = tableRepository.findAll().stream().filter(RestaurantTable::isOccupied).count();
+                    return new RuntimeException(
+                        "No available table found for capacity: " + requiredCapacity + 
+                        " (Total tables: " + tableCount + ", Occupied: " + occupied + 
+                        ", Free tables: " + freeTables.size() + ")"
+                    );
+                });
 
         table.setOccupied(true);
         table.setCurrentUserId(appUserId);

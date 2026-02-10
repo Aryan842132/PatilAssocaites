@@ -30,6 +30,17 @@ public class RestaurantController {
         return restaurantService.getAllTables();
     }
 
+    @GetMapping("/available")
+    public ResponseEntity<?> getAvailableTables() {
+        List<RestaurantTable> tables = restaurantService.getAllTables();
+        long available = tables.stream().filter(t -> !t.isOccupied()).count();
+        return ResponseEntity.ok(Map.of(
+                "totalTables", tables.size(),
+                "availableTables", available,
+                "tables", tables
+        ));
+    }
+
     @PostMapping("/book")
     public ResponseEntity<?> bookTable(@RequestBody Map<String, Object> payload) {
         int capacity = ((Number) payload.getOrDefault("capacity", 2)).intValue();
