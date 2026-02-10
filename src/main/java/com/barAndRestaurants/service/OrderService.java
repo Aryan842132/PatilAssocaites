@@ -1,6 +1,5 @@
 package com.barAndRestaurants.service;
 
-import com.barAndRestaurants.model.AppUser;
 import com.barAndRestaurants.model.Order;
 import com.barAndRestaurants.repository.AppUserRepository;
 import com.barAndRestaurants.repository.OrderRepository;
@@ -19,8 +18,8 @@ public class OrderService {
     }
 
     public Order createOrder(String appUserId, List<Order.OrderItem> items) {
-        AppUser appUser = appUserRepository.findById(appUserId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        appUserRepository.findById(appUserId)
+            .orElseThrow(() -> new RuntimeException("User not found"));
 
         Order order = new Order();
         order.setUserId(appUserId);
