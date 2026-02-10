@@ -8,4 +8,6 @@ public interface RestaurantTableRepository extends MongoRepository<RestaurantTab
     List<RestaurantTable> findByIsOccupied(boolean isOccupied);
 
     RestaurantTable findByTableNumber(int tableNumber);
+
+    List<RestaurantTable> findByCurrentUserIdAndIsOccupied(String currentUserId, boolean isOccupied);
 }

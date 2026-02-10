@@ -22,7 +22,7 @@ public class OrderController {
 
     @GetMapping("/{userId}")
     public List<Order> getOrders(@PathVariable String userId) {
-        return orderService.getOrdersByUser(userId);
+        return orderService.getOrdersByAppUser(userId);
     }
 
     // DTO for Order Request

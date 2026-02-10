@@ -11,8 +11,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.barAndRestaurants.model.AppUser;
 import com.barAndRestaurants.model.RestaurantTable;
-import com.barAndRestaurants.model.User;
 import com.barAndRestaurants.service.RestaurantService;
 
 @RestController
@@ -31,20 +31,20 @@ public class RestaurantController {
     }
 
     @PostMapping("/book")
-    public ResponseEntity<?> bookTable(@RequestBody Map<String, Integer> payload) {
-        int capacity = payload.getOrDefault("capacity", 2);
-        User user = restaurantService.bookTable(capacity);
+    public ResponseEntity<?> bookTable(@RequestBody Map<String, Object> payload) {
+        int capacity = ((Number) payload.getOrDefault("capacity", 2)).intValue();
+        String appUserId = (String) payload.get("appUserId");
+        AppUser appUser = restaurantService.bookTable(appUserId, capacity);
         return ResponseEntity.ok(Map.of(
-                "userId", user.getUserId(),
-                "tableId", user.getTableId(),
-                "active", user.isActive(),
-                "connectedAt", user.getConnectedAt()
+                "usersId", appUser.getUsersId(),
+                "username", appUser.getUsername(),
+                "tableBooked", true
         ));
     }
 
     @PostMapping("/release")
     public void releaseTable(@RequestBody Map<String, String> payload) {
-        String userId = payload.get("userId");
-        restaurantService.releaseTable(userId);
+        String appUserId = payload.get("appUserId");
+        restaurantService.releaseTable(appUserId);
     }
 }

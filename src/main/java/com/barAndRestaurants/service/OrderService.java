@@ -1,9 +1,9 @@
 package com.barAndRestaurants.service;
 
+import com.barAndRestaurants.model.AppUser;
 import com.barAndRestaurants.model.Order;
-import com.barAndRestaurants.model.User;
+import com.barAndRestaurants.repository.AppUserRepository;
 import com.barAndRestaurants.repository.OrderRepository;
-import com.barAndRestaurants.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -11,24 +11,19 @@ import java.util.List;
 @Service
 public class OrderService {
     private final OrderRepository orderRepository;
-    private final UserRepository userRepository;
+    private final AppUserRepository appUserRepository;
 
-    public OrderService(OrderRepository orderRepository, UserRepository userRepository) {
+    public OrderService(OrderRepository orderRepository, AppUserRepository appUserRepository) {
         this.orderRepository = orderRepository;
-        this.userRepository = userRepository;
+        this.appUserRepository = appUserRepository;
     }
 
-    public Order createOrder(String userId, List<Order.OrderItem> items) {
-        User user = userRepository.findById(userId)
+    public Order createOrder(String appUserId, List<Order.OrderItem> items) {
+        AppUser appUser = appUserRepository.findById(appUserId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        if (!user.isActive()) {
-            throw new RuntimeException("User session is not active");
-        }
-
         Order order = new Order();
-        order.setUserId(userId);
-        order.setTableId(user.getTableId());
+        order.setUserId(appUserId);
         order.setItems(items);
         order.setOrderTime(LocalDateTime.now());
         order.setStatus("PENDING");
@@ -39,7 +34,7 @@ public class OrderService {
         return orderRepository.save(order);
     }
 
-    public List<Order> getOrdersByUser(String userId) {
-        return orderRepository.findByUserId(userId);
+    public List<Order> getOrdersByAppUser(String appUserId) {
+        return orderRepository.findByUserId(appUserId);
     }
 }
