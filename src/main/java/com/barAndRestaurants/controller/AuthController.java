@@ -5,7 +5,9 @@ import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,6 +18,7 @@ import com.barAndRestaurants.payload.LoginRequest;
 import com.barAndRestaurants.payload.SignupRequest;
 import com.barAndRestaurants.service.AuthService;
 import com.barAndRestaurants.repository.AppUserRepository;
+import org.springframework.http.HttpStatus;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -32,6 +35,21 @@ public class AuthController {
     @GetMapping("/users")
     public ResponseEntity<List<AppUser>> getAllUsers() {
         return ResponseEntity.ok(userRepository.findAll());
+    }
+
+    @DeleteMapping("/users/{usersId}")
+    public ResponseEntity<?> deleteUser(@PathVariable String usersId) {
+        try {
+            if (!userRepository.existsById(usersId)) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(Map.of("message", "User not found", "usersId", usersId));
+            }
+            userRepository.deleteById(usersId);
+            return ResponseEntity.ok(Map.of("message", "User deleted", "usersId", usersId));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", e.getMessage()));
+        }
     }
 
     @PostMapping("/login")
