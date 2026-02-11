@@ -28,8 +28,12 @@ public class OrderService {
         Order order = new Order();
         order.setUserId(appUserId);
         
-        // Find the table booked by this user and set tableId
+        // Find the table booked by this user and set tableId. If no occupied table is found,
+        // fall back to any table that has this user as currentUserId (defensive for data drift).
         List<RestaurantTable> userTables = tableRepository.findByCurrentUserIdAndIsOccupied(appUserId, true);
+        if (userTables.isEmpty()) {
+            userTables = tableRepository.findByCurrentUserId(appUserId);
+        }
         if (!userTables.isEmpty()) {
             order.setTableId(userTables.get(0).getId());
         }

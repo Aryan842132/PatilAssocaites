@@ -25,7 +25,12 @@ public class OrderController {
 
     @PostMapping
     public Order createOrder(@RequestBody OrderRequest request) {
-        return orderService.createOrder(request.getAppUsersId(), request.getItems());
+        String userId = request.getAppUsersId();
+        if ((userId == null || userId.isBlank()) && request.getUserId() != null && !request.getUserId().isBlank()) {
+            userId = request.getUserId();
+        }
+
+        return orderService.createOrder(userId, request.getItems());
     }
 
     @GetMapping("/{appUsersId}")
@@ -36,6 +41,7 @@ public class OrderController {
     // DTO for Order Request
     public static class OrderRequest {
         private String appUsersId;
+        private String userId;
         private List<Order.OrderItem> items;
 
         public String getAppUsersId() {
@@ -44,6 +50,14 @@ public class OrderController {
 
         public void setAppUsersId(String appUsersId) {
             this.appUsersId = appUsersId;
+        }
+
+        public String getUserId() {
+            return userId;
+        }
+
+        public void setUserId(String userId) {
+            this.userId = userId;
         }
 
         public List<Order.OrderItem> getItems() {
